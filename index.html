@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>BP Form — Branches Performance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --bg: #06060A;
+  --surface: #0E0E14;
+  --surface-hover: #15151E;
+  --border: #1E1E2A;
+  --border-focus: #3B82F6;
+  --accent: #3B82F6;
+  --accent-light: #60A5FA;
+  --accent-glow: rgba(59, 130, 246, 0.15);
+  --accent-soft: rgba(59, 130, 246, 0.06);
+  --green: #10B981;
+  --green-glow: rgba(16, 185, 129, 0.15);
+  --gold: #F59E0B;
+  --gold-soft: rgba(245, 158, 11, 0.08);
+  --gold-glow: rgba(245, 158, 11, 0.15);
+  --white: #F4F4F5;
+  --text: #A1A1AA;
+  --muted: #52525B;
+  --error: #EF4444;
+  --radius: 14px;
+}
+
+html, body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg);
+  color: var(--white);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ===================== ANIMATED BACKGROUND ===================== */
+.bg-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.bg-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.4;
+  animation: orb-float 12s ease-in-out infinite;
+}
+
+.bg-orb-1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.2), transparent 70%);
+  top: -15%;
+  left: -10%;
+  animation-duration: 14s;
+}
+
+.bg-orb-2 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.12), transparent 70%);
+  bottom: -10%;
+  right: -10%;
+  animation-duration: 18s;
+  animation-delay: -4s;
+}
+
+.bg-orb-3 {
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.08), transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-duration: 20s;
+  animation-delay: -8s;
+}
+
+@keyframes orb-float {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(30px, -20px) scale(1.05); }
+  50% { transform: translate(-20px, 30px) scale(0.95); }
+  75% { transform: translate(20px, 20px) scale(1.02); }
+}
+
+/* Grid pattern overlay */
+.bg-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: 
+    linear-gradient(rgba(255,255,255,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.05) 1px, transparent 1px);
+  background-size: 40px 40px;
+  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+}
+
+/* Secondary finer grid */
+.bg-grid-fine {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-image: 
+    linear-gradient(rgba(59, 130, 246, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(59, 130, 246, 0.025) 1px, transparent 1px);
+  background-size: 120px 120px;
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 40%, black 10%, transparent 80%);
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 40%, black 10%, transparent 80%);
+}
+
+/* Horizon glow line */
+.bg-horizon {
+  position: fixed;
+  bottom: 30%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.08), rgba(99, 102, 241, 0.06), transparent);
+  z-index: 0;
+}
+
+/* ===================== LAYOUT ===================== */
+.form-container {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  padding-top: 60px;
+  padding-bottom: 40px;
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* ===================== PROGRESS ===================== */
+.progress-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(6, 6, 10, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.progress-bar {
+  height: 3px;
+  background: var(--border);
+  width: 100%;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent-light), #818CF8);
+  width: 0%;
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: -3px;
+  width: 10px;
+  height: 9px;
+  background: var(--accent-light);
+  border-radius: 50%;
+  box-shadow: 0 0 14px var(--accent), 0 0 30px var(--accent-glow);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.progress-fill[style*="width"]:not([style*="width: 0"])::after {
+  opacity: 1;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 24px;
+}
+
+.progress-info.hidden {
+  display: none;
+}
+
+.progress-step {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.progress-counter {
+  font-size: 10px;
+  font-weight: 500;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===================== STEP CONTAINER ===================== */
+.step {
+  position: absolute;
+  width: 100%;
+  max-width: 520px;
+  padding: 0 20px;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 1;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.step.active {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+.step.exit-up {
+  opacity: 0;
+  transform: translateY(-30px);
+  pointer-events: none;
+}
+
+.step.exit-down {
+  opacity: 0;
+  transform: translateY(30px);
+  pointer-events: none;
+}
+
+/* ===================== AUTHORITY BADGES ===================== */
+.authority-row {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 36px;
+  margin-bottom: 0;
+}
+
+.authority-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 14px 12px 12px;
+  background: rgba(255,255,255,0.025);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 10px;
+  flex: 1;
+  max-width: 130px;
+}
+
+.authority-card-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+}
+
+.authority-card-icon svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--muted);
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.authority-number {
+  font-size: 18px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.authority-label {
+  font-size: 9px;
+  font-weight: 400;
+  color: var(--muted);
+  letter-spacing: 0;
+  text-transform: none;
+  line-height: 1.35;
+  text-align: center;
+}
+
+/* ===================== INTRO SCREEN ===================== */
+.step-title {
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.2;
+  color: var(--white);
+  margin-bottom: 12px;
+  letter-spacing: -0.03em;
+}
+
+.step-title .highlight {
+  background: linear-gradient(135deg, var(--accent), var(--accent-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.step-title .highlight-red {
+  color: #FF0A0A;
+  -webkit-text-fill-color: #FF0A0A;
+}
+
+.step-subtitle {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.35;
+  color: var(--text);
+  margin-bottom: 32px;
+  max-width: 420px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* ===================== FORM ELEMENTS ===================== */
+.input-group {
+  margin-bottom: 8px;
+  text-align: left;
+}
+
+.input-label {
+  display: block;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 16px;
+  text-align: center;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+.input-field {
+  width: 100%;
+  padding: 16px 20px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 400;
+  outline: none;
+  transition: all 0.3s ease;
+  -webkit-appearance: none;
+  text-align: center;
+}
+
+.input-field::placeholder {
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow), 0 0 30px var(--accent-glow);
+  background: var(--surface-hover);
+}
+
+.input-field.error {
+  border-color: var(--error);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.1);
+}
+
+.input-hint {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px;
+  min-height: 18px;
+  transition: color 0.2s;
+  text-align: center;
+}
+
+.input-hint.error-msg {
+  color: var(--error);
+}
+
+/* ===================== PILL OPTIONS ===================== */
+.pill-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.pill-option {
+  padding: 10px 18px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 100px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pill-option:hover {
+  border-color: rgba(255,255,255,0.15);
+  color: var(--white);
+  background: var(--surface-hover);
+}
+
+.pill-option:active {
+  transform: scale(0.96);
+}
+
+.pill-option.selected {
+  border-color: var(--accent);
+  background: rgba(59, 130, 246, 0.1);
+  color: var(--white);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ===================== SELECTION CARDS ===================== */
+.option-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+}
+
+.option-card {
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.option-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-glow), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.option-card:hover {
+  border-color: rgba(59, 130, 246, 0.25);
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.option-card:active {
+  transform: scale(0.985);
+}
+
+.option-card.selected {
+  border-color: var(--accent);
+  background: var(--surface-hover);
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 4px 20px var(--accent-glow);
+}
+
+.option-card.selected::before {
+  opacity: 1;
+}
+
+.option-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  position: relative;
+  z-index: 1;
+  transition: all 0.25s;
+}
+
+.option-card.selected .option-icon {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.option-text {
+  position: relative;
+  z-index: 1;
+}
+
+.option-text-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.3;
+}
+
+.option-check {
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.25s;
+  position: relative;
+  z-index: 1;
+}
+
+.option-card.selected .option-check {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 10px var(--accent-glow);
+}
+
+.option-check svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.2s;
+}
+
+.option-card.selected .option-check svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ===================== CHALLENGE CARDS ===================== */
+.challenge-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: left;
+}
+
+.challenge-card {
+  padding: 14px 18px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.challenge-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, var(--accent-glow), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.challenge-card:hover {
+  border-color: rgba(59, 130, 246, 0.25);
+  background: var(--surface-hover);
+  transform: translateY(-1px);
+}
+
+.challenge-card:active {
+  transform: scale(0.985);
+}
+
+.challenge-card.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow), 0 4px 20px var(--accent-glow);
+}
+
+.challenge-card.selected::before {
+  opacity: 1;
+}
+
+.challenge-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.challenge-emoji {
+  font-size: 18px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  flex-shrink: 0;
+  transition: all 0.25s;
+}
+
+.challenge-card.selected .challenge-emoji {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+.challenge-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--white);
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.challenge-desc {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text);
+  line-height: 1.35;
+  margin-top: 5px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===================== BUTTONS ===================== */
+.btn-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 28px;
+  justify-content: center;
+}
+
+.btn-primary {
+  flex: 1;
+  max-width: 320px;
+  padding: 16px 28px;
+  background: linear-gradient(135deg, #00B85C, #00D26A);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 15px rgba(0, 210, 106, 0.2);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #00B85C, #00D26A, #00F07C, #00D26A, #00B85C);
+  background-size: 300% 300%;
+  animation: border-glow 4s ease-in-out infinite;
+  z-index: -1;
+  opacity: 0.5;
+  filter: blur(8px);
+}
+
+@keyframes border-glow {
+  0%, 100% { background-position: 0% 50%; opacity: 0.3; }
+  50% { background-position: 100% 50%; opacity: 0.6; }
+}
+
+.btn-primary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 25px rgba(0, 210, 106, 0.3), 0 0 40px rgba(0, 210, 106, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-primary:hover::after {
+  opacity: 1;
+}
+
+.btn-primary:active {
+  transform: scale(0.96);
+  box-shadow: 0 2px 10px rgba(0, 210, 106, 0.2);
+}
+
+.btn-primary:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary:disabled::before {
+  animation: none;
+}
+
+.btn-back {
+  padding: 16px 20px;
+  background: transparent;
+  color: var(--text);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.btn-back:hover {
+  border-color: var(--muted);
+  color: var(--white);
+}
+
+.btn-instagram {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 36px;
+  background: linear-gradient(135deg, #833AB4, #C13584, #E1306C, #F77737);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  width: 100%;
+  max-width: 320px;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 15px rgba(193, 53, 132, 0.25);
+}
+
+.btn-instagram:hover {
+  box-shadow: 0 6px 25px rgba(193, 53, 132, 0.35), 0 0 40px rgba(193, 53, 132, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-instagram:active {
+  transform: scale(0.97);
+}
+
+.btn-instagram svg {
+  width: 20px;
+  height: 20px;
+}
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 18px 36px;
+  background: linear-gradient(135deg, var(--green), #34D399);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  text-decoration: none;
+  width: 100%;
+  max-width: 320px;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 4px 15px var(--green-glow);
+}
+
+.btn-whatsapp:hover {
+  box-shadow: 0 6px 25px var(--green-glow), 0 0 40px var(--green-glow);
+  transform: translateY(-1px);
+}
+
+.btn-whatsapp:active {
+  transform: scale(0.97);
+}
+
+.btn-whatsapp svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* ===================== THANK YOU ===================== */
+.success-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: var(--green-glow);
+  border: 2px solid var(--green);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 28px;
+  animation: scale-in 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes scale-in {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.success-icon svg {
+  width: 32px;
+  height: 32px;
+  color: var(--green);
+}
+
+.thank-you-divider {
+  width: 60px;
+  height: 1px;
+  background: var(--border);
+  margin: 20px auto;
+}
+
+.thank-you-info {
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.6;
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+/* ===================== PARTICLES ===================== */
+.particle {
+  position: fixed;
+  width: 2px;
+  height: 2px;
+  background: var(--accent);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  animation: particle-drift 8s ease-in-out infinite;
+}
+
+@keyframes particle-drift {
+  0% { opacity: 0; transform: translateY(0) scale(1); }
+  20% { opacity: 0.4; }
+  80% { opacity: 0.2; }
+  100% { opacity: 0; transform: translateY(-200px) scale(0.5); }
+}
+
+/* ===================== RIPPLE EFFECT ===================== */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.25);
+  transform: scale(0);
+  animation: ripple-expand 0.6s linear;
+  pointer-events: none;
+}
+
+@keyframes ripple-expand {
+  to { transform: scale(4); opacity: 0; }
+}
+
+/* ===================== WORD REVEAL ANIMATION ===================== */
+.word-reveal span {
+  display: inline;
+  opacity: 0;
+  filter: blur(4px);
+  animation: word-in 0.5s ease forwards;
+}
+
+@keyframes word-in {
+  to { opacity: 1; filter: blur(0); }
+}
+
+/* ===================== COUNTER ANIMATION ===================== */
+.authority-number {
+  font-size: 18px;
+  font-weight: 800;
+  color: rgba(255,255,255,0.7);
+  letter-spacing: -0.02em;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ===================== CARD PULSE ON SELECT ===================== */
+@keyframes card-pulse {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.03); }
+  70% { transform: scale(0.98); }
+  100% { transform: scale(1); }
+}
+
+.challenge-card.pulse {
+  animation: card-pulse 0.4s ease;
+}
+
+/* ===================== CONFETTI ===================== */
+.confetti-piece {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  pointer-events: none;
+  z-index: 999;
+  opacity: 0;
+}
+
+/* ===================== BG COLOR TRANSITION ===================== */
+.bg-orb-1 {
+  transition: background 1.5s ease;
+}
+
+/* ===================== KEYBOARD HINT ===================== */
+.enter-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.enter-hint kbd {
+  padding: 2px 8px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: 'Inter', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+@media (pointer: coarse) {
+  .enter-hint { display: none; }
+}
+
+/* ===================== LOADING DOTS ===================== */
+.loading-dots {
+  display: inline-flex;
+  gap: 4px;
+  margin-left: 6px;
+}
+
+.loading-dots span {
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  border-radius: 50%;
+  animation: dot-bounce 1.2s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+.loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes dot-bounce {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.4; }
+  40% { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ===================== BRAND FOOTER ===================== */
+.brand-footer {
+  position: fixed;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  letter-spacing: 0.12em;
+  opacity: 0.4;
+  z-index: 10;
+  text-transform: uppercase;
+}
+
+/* ===================== RESPONSIVE ===================== */
+
+/* Landscape mobile / short screens */
+@media (max-height: 600px) {
+  .form-container { justify-content: flex-start; padding-top: 56px; padding-bottom: 20px; }
+  .step-title { font-size: 20px; margin-bottom: 8px; }
+  .step-subtitle { font-size: 13px; margin-bottom: 18px; }
+  .btn-row { margin-top: 16px; }
+  .authority-row { margin-top: 20px; }
+  .challenge-grid { gap: 8px; }
+  .challenge-card { padding: 10px 14px; }
+  .input-label { font-size: 17px; margin-bottom: 10px; }
+}
+
+/* Small phones (SE, Moto G, etc) */
+@media (max-width: 360px) {
+  .step-title { font-size: 19px; }
+  .step-subtitle { font-size: 12px; }
+  .input-label { font-size: 16px; }
+  .input-field { font-size: 14px; padding: 13px 16px; }
+  .btn-primary { font-size: 13px; padding: 14px 20px; }
+  .authority-card { padding: 8px 6px; min-width: 0; }
+  .authority-number { font-size: 13px; }
+  .authority-label { font-size: 7px; }
+  .authority-card-icon { width: 22px; height: 22px; }
+  .challenge-card { padding: 10px 12px; }
+  .challenge-title { font-size: 13px; }
+  .challenge-desc { font-size: 11px; }
+  .form-container { padding: 16px 14px; }
+}
+
+/* Standard mobile (375–480px) */
+@media (max-width: 480px) {
+  .step-title { font-size: 22px; letter-spacing: -0.025em; }
+  .step-subtitle { font-size: 13px; }
+  .input-label { font-size: 18px; }
+  .form-container { padding: 20px 16px; }
+  .progress-info { padding: 8px 16px; }
+  .authority-row { gap: 6px; }
+  .authority-card { padding: 10px 8px 8px; }
+  .authority-number { font-size: 15px; }
+  .authority-label { font-size: 8px; }
+  .btn-primary { max-width: 100%; }
+  .btn-whatsapp, .btn-instagram { max-width: 100%; }
+  .challenge-grid { gap: 8px; }
+  .pill-grid { gap: 6px; }
+  .pill-option { padding: 9px 14px; font-size: 12px; }
+}
+
+/* Tablet (481–768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+  .step { max-width: 460px; }
+  .step-title { font-size: 26px; }
+  .input-label { font-size: 20px; }
+  .btn-primary { max-width: 360px; }
+}
+
+/* Desktop (769px+) */
+@media (min-width: 769px) {
+  .step { max-width: 520px; }
+  .challenge-grid { gap: 10px; }
+}
+
+/* Touch devices - remove hover states that feel sticky */
+@media (hover: none) {
+  .option-card:hover,
+  .challenge-card:hover,
+  .pill-option:hover {
+    transform: none;
+  }
+  .btn-primary:hover {
+    transform: none;
+    box-shadow: 0 4px 15px rgba(0, 184, 92, 0.2);
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- Animated Background -->
+<div class="bg-canvas">
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+</div>
+<div class="bg-grid"></div>
+<div class="bg-grid-fine"></div>
+<div class="bg-horizon"></div>
+
+<!-- Particles -->
+<div class="particle" style="left:10%;top:80%;animation-delay:0s"></div>
+<div class="particle" style="left:25%;top:70%;animation-delay:2s"></div>
+<div class="particle" style="left:50%;top:90%;animation-delay:4s"></div>
+<div class="particle" style="left:75%;top:75%;animation-delay:1s"></div>
+<div class="particle" style="left:90%;top:85%;animation-delay:3s"></div>
+<div class="particle" style="left:40%;top:95%;animation-delay:5s"></div>
+<div class="particle" style="left:60%;top:80%;animation-delay:6s"></div>
+<div class="particle" style="left:15%;top:90%;animation-delay:7s"></div>
+
+<!-- Progress -->
+<div class="progress-wrapper">
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+  <div class="progress-info">
+    <span class="progress-step" id="progressLabel">Início</span>
+    <span class="progress-counter" id="progressCounter"></span>
+  </div>
+</div>
+
+<div class="form-container">
+
+  <!-- STEP 0: INTRO -->
+  <div class="step active" id="step0">
+    <h1 class="step-title word-reveal" id="introTitle">PARE DE <span class="highlight-red">TOLERAR</span> UM COMERCIAL QUE <span class="highlight-red">NÃO ENTREGA</span> O QUE DEVERIA!</h1>
+    <p class="step-subtitle">Clique no botão abaixo e preencha o formulário<br>com os seus dados.</p>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="goTo(1)">COMEÇAR</button>
+    </div>
+    <div class="enter-hint"><kbd>Enter ↵</kbd> para avançar</div>
+
+    <div class="authority-row">
+      <div class="authority-card">
+        <div class="authority-card-icon">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <span class="authority-number" id="counterRevenue">R$510M</span>
+        <span class="authority-label">em vendas geradas<br>para clientes</span>
+      </div>
+      <div class="authority-card">
+        <div class="authority-card-icon">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <span class="authority-number" id="counterYears">5 anos</span>
+        <span class="authority-label">de operação e<br>metodologia testada</span>
+      </div>
+      <div class="authority-card">
+        <div class="authority-card-icon">
+          <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        </div>
+        <span class="authority-number" id="counterCompanies">+90</span>
+        <span class="authority-label">empresas atendidas<br>em diferentes segmentos</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 1: NOME -->
+  <div class="step" id="step1">
+    <div class="input-group">
+      <label class="input-label">Qual é o seu nome?</label>
+      <input type="text" class="input-field" id="fieldNome" placeholder="Seu nome completo" autocomplete="name" enterkeyhint="next">
+      <div class="input-hint" id="hintNome"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(0)">←</button>
+      <button class="btn-primary" onclick="validateAndGo(1, 2)">Continuar</button>
+    </div>
+    <div class="enter-hint"><kbd>Enter ↵</kbd> para avançar</div>
+  </div>
+
+  <!-- STEP 2: WHATSAPP -->
+  <div class="step" id="step2">
+    <div class="input-group">
+      <label class="input-label" id="labelWhatsapp">Qual o seu WhatsApp?</label>
+      <input type="tel" class="input-field" id="fieldWhatsapp" placeholder="(00) 00000-0000" autocomplete="tel" enterkeyhint="next">
+      <div class="input-hint" id="hintWhatsapp"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(1)">←</button>
+      <button class="btn-primary" onclick="validateAndGo(2, 3)">Continuar</button>
+    </div>
+    <div class="enter-hint"><kbd>Enter ↵</kbd> para avançar</div>
+  </div>
+
+  <!-- STEP 3: INSTAGRAM -->
+  <div class="step" id="step3">
+    <div class="input-group">
+      <label class="input-label" id="labelInstagram">Qual o seu Instagram?</label>
+      <input type="text" class="input-field" id="fieldInstagram" placeholder="@seuusuario" enterkeyhint="next">
+      <div class="input-hint" id="hintInstagram"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(2)">←</button>
+      <button class="btn-primary" onclick="validateAndGo(3, 4)">Continuar</button>
+    </div>
+    <div class="enter-hint"><kbd>Enter ↵</kbd> para avançar</div>
+  </div>
+
+  <!-- STEP 4: ÁREA DE ATUAÇÃO -->
+  <div class="step" id="step4">
+    <div class="input-group">
+      <label class="input-label" id="labelArea">Qual a sua área de atuação?</label>
+      <input type="text" class="input-field" id="fieldArea" placeholder="Ex: Advocacia, Tecnologia, Imobiliário..." enterkeyhint="next">
+      <div class="input-hint" id="hintArea"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(3)">←</button>
+      <button class="btn-primary" onclick="validateAndGo(4, 5)">Continuar</button>
+    </div>
+    <div class="enter-hint"><kbd>Enter ↵</kbd> para avançar</div>
+  </div>
+
+  <!-- STEP 5: DESAFIO -->
+  <div class="step" id="step5">
+    <label class="input-label" id="labelDesafio">Qual o principal desafio do seu comercial hoje?</label>
+    <div class="challenge-grid" id="challengeGrid">
+      <div class="challenge-card" data-value="Aquisição" onclick="selectAndSubmit(this)">
+        <div class="challenge-header">
+          <div class="challenge-emoji">🎯</div>
+          <div class="challenge-title">Aquisição</div>
+        </div>
+        <div class="challenge-desc">Faltam oportunidades entrando. O fluxo de novos contatos e leads não é suficiente ou é imprevisível.</div>
+      </div>
+      <div class="challenge-card" data-value="Conversão" onclick="selectAndSubmit(this)">
+        <div class="challenge-header">
+          <div class="challenge-emoji">🔄</div>
+          <div class="challenge-title">Conversão</div>
+        </div>
+        <div class="challenge-desc">Oportunidades chegam, mas poucas viram venda. O processo entre o primeiro contato e o fechamento está fraco.</div>
+      </div>
+      <div class="challenge-card" data-value="Ticket Médio" onclick="selectAndSubmit(this)">
+        <div class="challenge-header">
+          <div class="challenge-emoji">💰</div>
+          <div class="challenge-title">Ticket Médio</div>
+        </div>
+        <div class="challenge-desc">Vende, mas por um valor abaixo do que deveria. A oferta ou a percepção de valor não sustenta o preço desejado.</div>
+      </div>
+      <div class="challenge-card" data-value="Formação de Time" onclick="selectAndSubmit(this)">
+        <div class="challenge-header">
+          <div class="challenge-emoji">👥</div>
+          <div class="challenge-title">Formação de Time Comercial</div>
+        </div>
+        <div class="challenge-desc">Dificuldade em contratar, estruturar e fazer um time de vendas performar de forma consistente.</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="goTo(4)">←</button>
+    </div>
+  </div>
+
+  <!-- STEP 6: THANK YOU -->
+  <div class="step" id="step6">
+    <div class="success-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <h1 class="step-title" id="thankYouTitle">Recebemos suas informações!</h1>
+    <p class="step-subtitle">Nossa equipe vai analisar o seu cenário e entrar em contato pelo WhatsApp em breve.</p>
+    <div class="thank-you-divider"></div>
+    <p class="thank-you-info" style="display:none"></p>
+    <div class="btn-row">
+      <a class="btn-primary" href="https://instagram.com/gustavoobenedetti" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">CONCLUIR</a>
+    </div>
+  </div>
+
+</div>
+
+<div class="brand-footer">Branches Performance</div>
+
+<script>
+const CONFIG = {
+  whatsappNumber: '5548999999999',
+  whatsappMessage: 'Olá! Acabei de preencher o formulário e quero saber mais sobre estruturação comercial.',
+  webhookUrl: 'https://script.google.com/macros/s/AKfycbwRvf3xtl2FuOwSd-xHYmUxATuI0AazVPXYO65Yjgr80TEVOz6bObLd4khH_3B_uHnk/exec',
+  totalSteps: 5
+};
+
+let currentStep = 0;
+let formData = { nome: '', whatsapp: '', instagram: '', area: '', desafio: '' };
+
+// ==================== PROGRESSIVE CAPTURE ====================
+async function sendToSheet(etapa) {
+  try {
+    await fetch(CONFIG.webhookUrl, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...formData, etapa })
+    });
+  } catch(e) {
+    console.log('Sheet error:', e);
+  }
+}
+
+function goTo(step) {
+  const current = document.getElementById(`step${currentStep}`);
+  const next = document.getElementById(`step${step}`);
+  if (!current || !next) return;
+  const goingForward = step > currentStep;
+  current.classList.remove('active');
+  current.classList.add(goingForward ? 'exit-up' : 'exit-down');
+  setTimeout(() => { current.classList.remove('exit-up'); current.classList.remove('exit-down'); }, 500);
+  next.style.transform = goingForward ? 'translateY(30px)' : 'translateY(-30px)';
+  next.style.opacity = '0';
+  requestAnimationFrame(() => { next.classList.add('active'); next.style.transform = ''; next.style.opacity = ''; });
+  currentStep = step;
+  updateProgress();
+  updatePersonalizedLabels();
+  focusInput(step);
+}
+
+function updatePersonalizedLabels() {
+  if (formData.nome) {
+    const firstName = formData.nome.split(' ')[0];
+    document.getElementById('labelWhatsapp').textContent = firstName + ', qual o seu WhatsApp?';
+    document.getElementById('labelInstagram').textContent = firstName + ', qual o seu Instagram?';
+    document.getElementById('labelArea').textContent = firstName + ', qual a sua área de atuação?';
+    document.getElementById('labelDesafio').textContent = firstName + ', qual o principal desafio do seu comercial hoje?';
+  }
+}
+
+function focusInput(step) {
+  setTimeout(() => {
+    const inputs = { 1: 'fieldNome', 2: 'fieldWhatsapp', 3: 'fieldInstagram', 4: 'fieldArea' };
+    if (inputs[step]) document.getElementById(inputs[step])?.focus();
+  }, 400);
+}
+
+const stepLabels = ['Início', 'Nome', 'WhatsApp', 'Instagram', 'Segmento', 'Desafio', 'Concluído'];
+
+function updateProgress() {
+  const pct = currentStep === 0 ? 0 : Math.min((currentStep / CONFIG.totalSteps) * 100, 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+  const info = document.querySelector('.progress-info');
+  if (currentStep === 0) {
+    info.classList.add('hidden');
+  } else {
+    info.classList.remove('hidden');
+  }
+  document.getElementById('progressLabel').textContent = stepLabels[currentStep] || '';
+  document.getElementById('progressCounter').textContent = currentStep > 0 && currentStep <= CONFIG.totalSteps ? `${currentStep}/${CONFIG.totalSteps}` : '';
+}
+
+function validateAndGo(from, to) {
+  let valid = true;
+  if (from === 1) {
+    const val = document.getElementById('fieldNome').value.trim();
+    if (val.length < 2) { showError('fieldNome', 'hintNome', 'Informe o seu nome'); valid = false; }
+    else { clearError('fieldNome', 'hintNome'); formData.nome = val; }
+  }
+  if (from === 2) {
+    const val = document.getElementById('fieldWhatsapp').value.trim();
+    const digits = val.replace(/\D/g, '');
+    if (digits.length < 10 || digits.length > 11) { showError('fieldWhatsapp', 'hintWhatsapp', 'Informe um número válido'); valid = false; }
+    else { clearError('fieldWhatsapp', 'hintWhatsapp'); formData.whatsapp = val; }
+  }
+  if (from === 3) {
+    const val = document.getElementById('fieldInstagram').value.trim();
+    if (val.length < 2) { showError('fieldInstagram', 'hintInstagram', 'Informe o seu Instagram'); valid = false; }
+    else { clearError('fieldInstagram', 'hintInstagram'); formData.instagram = val; }
+  }
+  if (from === 4) {
+    const val = document.getElementById('fieldArea').value.trim();
+    if (val.length < 2) { showError('fieldArea', 'hintArea', 'Informe a sua área de atuação'); valid = false; }
+    else { clearError('fieldArea', 'hintArea'); formData.area = val; }
+  }
+  if (valid) {
+    const etapas = { 1: 'nome', 2: 'whatsapp', 3: 'instagram', 4: 'area' };
+    sendToSheet(etapas[from]);
+    goTo(to);
+  }
+}
+
+function showError(fId, hId, msg) {
+  document.getElementById(fId).classList.add('error');
+  const h = document.getElementById(hId); h.textContent = msg; h.classList.add('error-msg');
+}
+function clearError(fId, hId) {
+  document.getElementById(fId).classList.remove('error');
+  const h = document.getElementById(hId); h.textContent = ''; h.classList.remove('error-msg');
+}
+
+function selectAndSubmit(el) {
+  el.parentElement.querySelectorAll('.challenge-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  el.classList.add('pulse');
+  formData.desafio = el.dataset.value;
+  setTimeout(() => submitForm(), 700);
+}
+
+function selectPill(el, type) {
+  el.parentElement.querySelectorAll('.pill-option').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  if (type === 'area') { formData.area = el.dataset.value; document.getElementById('btnArea').disabled = false; }
+}
+
+function selectOption(el, type) {
+  el.parentElement.querySelectorAll('.option-card, .challenge-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  if (type === 'area') { formData.area = el.dataset.value; document.getElementById('btnArea').disabled = false; }
+  if (type === 'challenge') { formData.desafio = el.dataset.value; document.getElementById('btnChallenge').disabled = false; }
+}
+
+async function submitForm() {
+  document.getElementById('thankYouTitle').textContent = `${formData.nome.split(' ')[0]}, recebemos suas informações!`;
+  await sendToSheet('concluido');
+  goTo(6);
+}
+
+document.getElementById('fieldWhatsapp').addEventListener('input', function(e) {
+  const input = e.target;
+  const cursorPos = input.selectionStart;
+  let v = input.value.replace(/\D/g, '');
+  if (v.length > 11) v = v.slice(0, 11);
+  
+  let formatted = '';
+  if (v.length > 0) formatted = '(' + v.slice(0, 2);
+  if (v.length > 2) formatted += ') ' + v.slice(2, 7);
+  if (v.length > 7) formatted += '-' + v.slice(7, 11);
+  
+  input.value = formatted;
+});
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    if (currentStep === 0) goTo(1);
+    else if (currentStep === 1) validateAndGo(1, 2);
+    else if (currentStep === 2) validateAndGo(2, 3);
+    else if (currentStep === 3) validateAndGo(3, 4);
+    else if (currentStep === 4) validateAndGo(4, 5);
+    else if (currentStep === 5 && formData.desafio) submitForm();
+  }
+});
+
+updateProgress();
+
+// ==================== WORD REVEAL ====================
+function initWordReveal() {
+  const title = document.getElementById('introTitle');
+  if (!title) return;
+  const parts = [];
+  title.childNodes.forEach(node => {
+    if (node.nodeType === 3) {
+      node.textContent.split(/(\s+)/).forEach(w => {
+        if (w.trim()) parts.push({ type: 'word', content: w });
+        else if (w) parts.push({ type: 'space', content: w });
+      });
+    } else if (node.nodeType === 1) {
+      parts.push({ type: 'element', el: node });
+    }
+  });
+  let delay = 0;
+  title.innerHTML = '';
+  parts.forEach(p => {
+    if (p.type === 'space') {
+      title.appendChild(document.createTextNode(p.content));
+    } else if (p.type === 'element') {
+      p.el.style.cssText += `display:inline-block;opacity:0;filter:blur(4px);animation:word-in 0.5s ease ${delay}s forwards`;
+      title.appendChild(p.el);
+      delay += 0.08;
+    } else {
+      const span = document.createElement('span');
+      span.textContent = p.content;
+      span.style.cssText = `opacity:0;filter:blur(4px);animation:word-in 0.5s ease ${delay}s forwards`;
+      title.appendChild(span);
+      delay += 0.06;
+    }
+  });
+}
+
+// ==================== COUNTERS ====================
+function animateVal(el, target, prefix, suffix, duration) {
+  if (!el) return;
+  const start = performance.now();
+  (function update(now) {
+    const p = Math.min((now - start) / duration, 1);
+    const e = 1 - Math.pow(1 - p, 3);
+    el.textContent = prefix + Math.round(e * target) + suffix;
+    if (p < 1) requestAnimationFrame(update);
+  })(start);
+}
+
+function startCounters() {
+  setTimeout(() => animateVal(document.getElementById('counterCompanies'), 90, '+', '', 1200), 300);
+  setTimeout(() => animateVal(document.getElementById('counterYears'), 5, '', ' anos', 900), 500);
+  setTimeout(() => {
+    const el = document.getElementById('counterRevenue');
+    if (!el) return;
+    const start = performance.now();
+    (function update(now) {
+      const p = Math.min((now - start) / 1400, 1);
+      const e = 1 - Math.pow(1 - p, 3);
+      el.textContent = 'R$' + Math.round(e * 510) + 'M';
+      if (p < 1) requestAnimationFrame(update);
+    })(start);
+  }, 400);
+}
+
+// ==================== CONFETTI ====================
+function launchConfetti() {
+  const colors = ['#3B82F6','#00B85C','#F59E0B','#EC4899','#8B5CF6','#ffffff','#FF0A0A'];
+  for (let i = 0; i < 60; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.style.cssText = `position:fixed;pointer-events:none;z-index:999;left:${Math.random()*100}vw;top:${Math.random()*40+10}vh;width:${Math.random()*8+4}px;height:${Math.random()*8+4}px;background:${colors[Math.floor(Math.random()*colors.length)]};border-radius:${Math.random()>.5?'50%':'2px'};`;
+      document.body.appendChild(el);
+      el.animate([
+        {opacity:1,transform:'translate(0,0) rotate(0deg)'},
+        {opacity:0,transform:`translate(${(Math.random()-.5)*200}px,${Math.random()*300+100}px) rotate(${Math.random()*720}deg)`}
+      ],{duration:Math.random()*1500+1000,easing:'ease-out',fill:'forwards'}).onfinish=()=>el.remove();
+    }, i * 25);
+  }
+}
+
+// ==================== BG COLOR SHIFT ====================
+const bgPalette = [
+  'rgba(59,130,246,0.2)','rgba(99,102,241,0.2)',
+  'rgba(139,92,246,0.2)','rgba(16,185,129,0.18)',
+  'rgba(16,185,129,0.25)','rgba(16,185,129,0.35)'
+];
+
+function shiftBg(step) {
+  const orb = document.querySelector('.bg-orb-1');
+  if (orb) orb.style.background = `radial-gradient(circle, ${bgPalette[Math.min(step, bgPalette.length-1)]}, transparent 70%)`;
+}
+
+// Patch goTo for bg shift + confetti
+const _goToOrig = goTo;
+goTo = function(step) {
+  _goToOrig(step);
+  shiftBg(step);
+  if (step === 6) setTimeout(launchConfetti, 500);
+};
+
+// ==================== RIPPLE ON ALL BUTTONS ====================
+function addRipple(e) {
+  const btn = e.currentTarget;
+  const circle = document.createElement('span');
+  const diameter = Math.max(btn.clientWidth, btn.clientHeight);
+  const radius = diameter / 2;
+  const rect = btn.getBoundingClientRect();
+  circle.style.cssText = `width:${diameter}px;height:${diameter}px;left:${e.clientX-rect.left-radius}px;top:${e.clientY-rect.top-radius}px;`;
+  circle.classList.add('ripple');
+  btn.querySelector('.ripple')?.remove();
+  btn.appendChild(circle);
+}
+
+document.querySelectorAll('.btn-primary, .btn-back, .btn-instagram').forEach(btn => {
+  btn.addEventListener('click', addRipple);
+});
+
+setTimeout(() => { initWordReveal(); startCounters(); }, 200);
+</script>
+
+</body>
+</html>
