@@ -1095,9 +1095,37 @@ html, body {
     box-shadow: 0 4px 15px rgba(0, 184, 92, 0.2);
   }
 }
+
+/* Fix challenge step overflow on short mobile screens */
+@media (max-width: 480px) and (max-height: 750px) {
+  #step5 .input-label {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  .challenge-card {
+    padding: 10px 14px;
+  }
+  .challenge-title {
+    font-size: 13px;
+  }
+  .challenge-desc {
+    font-size: 11px;
+    margin-top: 4px;
+  }
+  .challenge-emoji {
+    width: 30px;
+    height: 30px;
+    font-size: 15px;
+  }
+  .challenge-grid {
+    gap: 7px;
+  }
+}
 </style>
 </head>
 <body>
+
+<iframe name="hidden_iframe" style="display:none"></iframe>
 
 <!-- Animated Background -->
 <div class="bg-canvas">
@@ -1282,22 +1310,30 @@ html, body {
 const CONFIG = {
   whatsappNumber: '5548999999999',
   whatsappMessage: 'Olá! Acabei de preencher o formulário e quero saber mais sobre estruturação comercial.',
-  webhookUrl: 'https://script.google.com/macros/s/AKfycbwRvf3xtl2FuOwSd-xHYmUxATuI0AazVPXYO65Yjgr80TEVOz6bObLd4khH_3B_uHnk/exec',
+  webhookUrl: 'https://script.google.com/macros/s/AKfycbzNiGKO4uCu4GMzDM06Sg7yliMBvx4AdhC3gD1mFnUeEaimZJalfI2lRfaDkxgcBgnI/exec',
   totalSteps: 5
 };
 
 let currentStep = 0;
 let formData = { nome: '', whatsapp: '', instagram: '', area: '', desafio: '' };
 
-// ==================== PROGRESSIVE CAPTURE ====================
-async function sendToSheet(etapa) {
+// ==================== PROGRESSIVE CAPTURE (CORS-safe) ====================
+function sendToSheet(etapa) {
   try {
-    await fetch(CONFIG.webhookUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ ...formData, etapa })
-    });
+    const payload = { ...formData, etapa };
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = CONFIG.webhookUrl;
+    form.target = 'hidden_iframe';
+    form.style.display = 'none';
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'payload';
+    input.value = JSON.stringify(payload);
+    form.appendChild(input);
+    document.body.appendChild(form);
+    form.submit();
+    setTimeout(() => form.remove(), 2000);
   } catch(e) {
     console.log('Sheet error:', e);
   }
@@ -1396,7 +1432,7 @@ function selectAndSubmit(el) {
   el.classList.add('selected');
   el.classList.add('pulse');
   formData.desafio = el.dataset.value;
-  setTimeout(() => submitForm(), 700);
+  setTimeout(() => submitForm(), 350);
 }
 
 function selectPill(el, type) {
@@ -1414,7 +1450,7 @@ function selectOption(el, type) {
 
 async function submitForm() {
   document.getElementById('thankYouTitle').textContent = `${formData.nome.split(' ')[0]}, recebemos suas informações!`;
-  await sendToSheet('concluido');
+  sendToSheet('concluido');
   goTo(6);
 }
 
