@@ -37,7 +37,7 @@ html,body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);colo
 .progress-step,.progress-counter{font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--muted);text-transform:uppercase}
 
 /* CONTAINER */
-.container{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px 40px;position:relative;z-index:1;width:100%}
+.container{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px 40px;position:relative;z-index:1;width:100%}
 
 /* SCREENS */
 .screen{position:absolute;width:100%;max-width:520px;padding:0 20px;opacity:0;transform:translateX(40px);transition:opacity .38s cubic-bezier(.4,0,.2,1),transform .38s cubic-bezier(.4,0,.2,1);pointer-events:none;text-align:center;box-sizing:border-box;will-change:opacity,transform}
@@ -45,7 +45,7 @@ html,body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);colo
 .screen.exit-left{opacity:0;transform:translateX(-40px)}
 
 /* TITLE */
-.title{font-size:clamp(17px,4.5vw,24px);font-weight:900;line-height:1.2;color:var(--white);letter-spacing:-.03em;margin-bottom:10px}
+.title{font-size:clamp(15px,4vw,21px);font-weight:900;line-height:1.2;color:var(--white);letter-spacing:-.03em;margin-bottom:10px}
 .title .green{color:var(--green)}
 .subtitle{font-size:14px;color:var(--text);line-height:1.5;margin-bottom:8px;max-width:380px;margin-left:auto;margin-right:auto}
 
@@ -76,7 +76,7 @@ html,body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);colo
 .chart-gridline{stroke:rgba(255,255,255,.04);stroke-width:1}
 
 /* BTN — pulsing glow */
-.btn{width:100%;max-width:340px;padding:18px 28px;background:linear-gradient(135deg,var(--green),var(--green-light));color:#fff;border:none;border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:20px;font-weight:800;cursor:pointer;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 20px var(--green-glow);margin:0 auto;display:block;transition:transform .2s;letter-spacing:.02em;animation:heartbeat 1.8s ease-in-out infinite}
+.btn{width:100%;max-width:280px;padding:14px 24px;background:linear-gradient(135deg,var(--green),var(--green-light));color:#fff;border:none;border-radius:var(--radius);font-family:'Inter',sans-serif;font-size:16px;font-weight:800;cursor:pointer;position:relative;overflow:hidden;-webkit-tap-highlight-color:transparent;box-shadow:0 4px 20px var(--green-glow);margin:0 auto;display:block;transition:transform .2s;letter-spacing:.02em;animation:heartbeat 1.8s ease-in-out infinite}
 .btn::before{content:'';position:absolute;inset:-3px;border-radius:17px;background:linear-gradient(135deg,var(--green),var(--green-light),#00F07C,var(--green-light),var(--green));background-size:300% 300%;animation:border-glow 4s ease-in-out infinite;z-index:-1;opacity:.6;filter:blur(10px)}
 .btn::after{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,.2);border-radius:50%;transform:translate(-50%,-50%);transition:width .5s,height .5s}
 .btn:active{transform:scale(.96)}
@@ -92,6 +92,12 @@ html,body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);colo
 
 /* INPUTS */
 .input-label{display:block;font-size:18px;font-weight:700;color:var(--white);margin-bottom:14px;text-align:left}
+
+/* DESEJO OPTIONS */
+.desejo-options{display:flex;flex-direction:column;gap:10px;width:100%}
+.desejo-btn{width:100%;padding:16px 20px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--text);font-family:'Inter',sans-serif;font-size:14px;font-weight:500;cursor:pointer;transition:border-color .18s,background .18s,color .18s,box-shadow .18s;text-align:center;-webkit-tap-highlight-color:transparent}
+.desejo-btn:hover{border-color:rgba(59,130,246,.25);background:var(--surface-hover);color:var(--white)}
+.desejo-btn:active{transform:scale(.98);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow);color:var(--white)}
 .input-field{width:100%;padding:16px 20px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--radius);color:var(--white);font-family:'Inter',sans-serif;font-size:16px;outline:none;transition:border-color .3s,box-shadow .3s;-webkit-appearance:none;margin-bottom:6px}
 .input-field::placeholder{color:var(--muted)}
 .input-field:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-glow)}
@@ -149,8 +155,6 @@ html,body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);colo
 
   <!-- INTRO -->
   <div class="screen active" id="screen-intro">
-    <div class="promise" style="margin-bottom:16px">Metodologia aplicada em +100 negócios</div>
-
     <h1 class="title">VOCÊ É EMPRESÁRIO(A) E QUER <span class="green">AUMENTAR O RESULTADO</span> DO COMERCIAL?</h1>
 
     <button class="btn" id="startBtn">QUERO!</button>
@@ -173,12 +177,39 @@ html,body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);colo
   <div class="screen" id="screen-whatsapp">
     <div class="input-group">
       <label class="input-label" id="labelWhatsapp">Qual o seu WhatsApp?</label>
-      <input type="tel" class="input-field" id="fWhatsapp" placeholder="(00) 00000-0000" autocomplete="tel" enterkeyhint="done">
+      <input type="tel" class="input-field" id="fWhatsapp" placeholder="(00) 00000-0000" autocomplete="tel" enterkeyhint="next">
       <div class="input-hint" id="hintWhatsapp"></div>
     </div>
     <div class="btn-row">
       <button class="btn-back" onclick="showScreen('nome','back')">←</button>
-      <button class="btn" onclick="submitWhatsapp()">Enviar</button>
+      <button class="btn" onclick="submitWhatsapp()">Continuar</button>
+    </div>
+  </div>
+
+  <!-- ÁREA -->
+  <div class="screen" id="screen-area">
+    <div class="input-group">
+      <label class="input-label">Qual a sua área de atuação?</label>
+      <input type="text" class="input-field" id="fArea" placeholder="Ex: Advocacia, Tecnologia, Imobiliário..." autocomplete="off" enterkeyhint="next">
+      <div class="input-hint" id="hintArea"></div>
+    </div>
+    <div class="btn-row">
+      <button class="btn-back" onclick="showScreen('whatsapp','back')">←</button>
+      <button class="btn" onclick="submitArea()">Continuar</button>
+    </div>
+  </div>
+
+  <!-- DESEJO -->
+  <div class="screen" id="screen-desejo">
+    <label class="input-label" style="text-align:center;margin-bottom:18px">Seu principal desejo é:</label>
+    <div class="desejo-options" id="desejoOptions">
+      <button class="desejo-btn" onclick="submitDesejo('Captar mais leads')">Captar mais leads</button>
+      <button class="desejo-btn" onclick="submitDesejo('Converter mais leads em clientes')">Converter mais leads em clientes</button>
+      <button class="desejo-btn" onclick="submitDesejo('Melhorar meu preço')">Melhorar meu preço</button>
+      <button class="desejo-btn" onclick="submitDesejo('Formatar time de vendas')">Formatar time de vendas</button>
+    </div>
+    <div style="margin-top:14px">
+      <button class="btn-back" onclick="showScreen('area','back')">← Voltar</button>
     </div>
   </div>
 
@@ -188,7 +219,7 @@ html,body{font-family:'Inter',-apple-system,sans-serif;background:var(--bg);colo
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
     </div>
     <h1 class="title" id="thanksTitle" style="font-size:22px">Recebemos suas informações!</h1>
-    <div class="thank-you-msg">Em até <strong>24h</strong>, um especialista da Branches vai entrar em contato pelo WhatsApp para entender sua operação.</div>
+    <div class="thank-you-msg">Fique atento(a)! Em breve um executivo entrará em contato!</div>
     <a class="btn" href="https://instagram.com/gustavoobenedetti" target="_blank" rel="noopener" style="text-decoration:none;display:flex;align-items:center;justify-content:center;">CONCLUIR</a>
   </div>
 
@@ -207,6 +238,8 @@ const screens = {
   intro: document.getElementById('screen-intro'),
   nome: document.getElementById('screen-nome'),
   whatsapp: document.getElementById('screen-whatsapp'),
+  area: document.getElementById('screen-area'),
+  desejo: document.getElementById('screen-desejo'),
   thanks: document.getElementById('screen-thanks')
 };
 
@@ -236,12 +269,13 @@ function showScreen(name, dir) {
   updateProgress(name);
   if (name === 'nome') setTimeout(() => document.getElementById('fNome').focus(), 400);
   if (name === 'whatsapp') setTimeout(() => document.getElementById('fWhatsapp').focus(), 400);
+  if (name === 'area') setTimeout(() => document.getElementById('fArea').focus(), 400);
 }
 
 function updateProgress(name) {
-  const map = { intro: 0, nome: 33, whatsapp: 66, thanks: 100 };
-  const labels = { intro: '', nome: 'Nome', whatsapp: 'WhatsApp', thanks: 'Concluído' };
-  const counters = { intro: '', nome: '1/2', whatsapp: '2/2', thanks: '' };
+  const map = { intro: 0, nome: 20, whatsapp: 40, area: 60, desejo: 80, thanks: 100 };
+  const labels = { intro: '', nome: 'Nome', whatsapp: 'WhatsApp', area: 'Área', desejo: 'Desejo', thanks: 'Concluído' };
+  const counters = { intro: '', nome: '1/4', whatsapp: '2/4', area: '3/4', desejo: '4/4', thanks: '' };
   document.getElementById('progressFill').style.width = (map[name] || 0) + '%';
   const info = document.getElementById('progressInfo');
   if (name === 'intro') { info.classList.add('hidden'); }
@@ -313,13 +347,32 @@ function submitWhatsapp() {
   document.getElementById('hintWhatsapp').textContent = '';
   formData.whatsapp = val;
   if (typeof fbq !== 'undefined') fbq('track', 'Lead');
+  sendToSheet('whatsapp');
+  showScreen('area');
+}
+
+function submitArea() {
+  const val = document.getElementById('fArea').value.trim();
+  if (val.length < 2) {
+    document.getElementById('fArea').classList.add('error');
+    document.getElementById('hintArea').textContent = 'Informe sua área de atuação';
+    document.getElementById('hintArea').classList.add('error-msg');
+    return;
+  }
+  document.getElementById('fArea').classList.remove('error');
+  document.getElementById('hintArea').textContent = '';
+  formData.area = val;
+  sendToSheet('area');
+  showScreen('desejo');
+}
+
+function submitDesejo(desejo) {
+  formData.desafio = desejo;
   sendToSheet('concluido');
   document.getElementById('thanksTitle').textContent = formData.nome.split(' ')[0] + ', recebemos suas informações!';
   showScreen('thanks');
-  // BG shift
   const orb = document.querySelector('.bg-orb-1');
   if(orb) orb.style.background='radial-gradient(circle, rgba(16,185,129,.25), transparent 70%)';
-  // Confetti
   setTimeout(confetti, 400);
 }
 
@@ -329,6 +382,7 @@ document.addEventListener('keydown', e => {
     if (_active === screens.intro) showScreen('nome');
     else if (_active === screens.nome) submitNome();
     else if (_active === screens.whatsapp) submitWhatsapp();
+    else if (_active === screens.area) submitArea();
   }
 });
 
