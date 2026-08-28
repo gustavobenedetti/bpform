@@ -929,7 +929,7 @@ html, body {
 .bp-about-name { font-size: 16px; font-weight: 800; color: #F4F4F5; margin-bottom: 2px; }
 .bp-about-role { font-size: 11px; color: var(--accent-light); font-weight: 600; margin-bottom: 10px; }
 .bp-about-bio { font-size: 12px; color: var(--text); line-height: 1.6; }
-.cta-explainer { font-size: 13px; color: #E4E4E7; font-weight: 600; line-height: 1.6; text-align: center; max-width: 340px; margin: 14px auto 0; }
+.cta-explainer { font-size: 13px; color: #FBBF24; font-weight: 600; line-height: 1.35; text-align: center; max-width: 340px; margin: 14px auto 0; }
 .clients-marquee-section { width: 100%; max-width: 480px; margin: 32px auto 0; overflow: hidden; }
 .clients-marquee-label { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; text-align: center; }
 .marquee-track { overflow: hidden; position: relative; }
@@ -942,16 +942,16 @@ html, body {
 .client-card { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0 18px; height: 48px; display: flex; align-items: center; justify-content: center; min-width: 100px; transition: border-color .25s; }
 .client-card:hover { border-color: rgba(59,130,246,0.4); }
 .client-logo { height: 22px; width: auto; filter: brightness(0) invert(1) opacity(0.75); }
-.exclusive-badge { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: 0.02em; color: #FF0A0A; background: rgba(255,10,10,0.08); border: 1px solid rgba(255,10,10,0.2); padding: 8px 16px; border-radius: 100px; margin-bottom: 16px; text-align: center; }
+.exclusive-badge { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.01em; color: #FF0A0A; background: rgba(255,10,10,0.08); border: 1px solid rgba(255,10,10,0.2); padding: 7px 14px; border-radius: 100px; margin-bottom: 16px; text-align: center; white-space: nowrap; }
 .results-section { width: 100%; max-width: 480px; margin: 48px auto 0; overflow: hidden; padding-top: 28px; border-top: 1px solid var(--border); }
-.results-label { font-size: 21px; font-weight: 800; letter-spacing: -0.01em; text-transform: none; color: #F4F4F5; margin-bottom: 14px; text-align: center; }
+.results-label { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; text-transform: none; color: #F4F4F5; margin-bottom: 14px; text-align: center; }
 .results-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
-.result-card { min-width: 100%; box-sizing: border-box; display: flex; flex-direction: column; height: 100%; }
-.result-img { width: 100%; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px 12px 0 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.result-img img { width: 100%; height: auto; display: block; }
+.result-card { min-width: 0; box-sizing: border-box; display: flex; flex-direction: column; height: 100%; }
+.result-img { width: 100%; min-width: 0; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-radius: 12px 12px 0 0; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.result-img img { max-width: 100%; width: 100%; height: auto; display: block; }
 .result-placeholder { font-size: 11px; color: var(--muted); font-weight: 600; padding: 40px 0; }
-.result-info { width: 100%; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px; padding: 10px 8px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 72px; }
-.result-desc { font-size: 10px; color: var(--text); line-height: 1.4; margin-bottom: 6px; min-height: 28px; display: flex; align-items: center; justify-content: center; }
+.result-info { width: 100%; min-width: 0; margin: 0 auto; background: var(--surface); border: 1px solid var(--border); border-top: none; border-radius: 0 0 12px 12px; padding: 10px 8px; text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 72px; box-sizing: border-box; }
+.result-desc { font-size: 10px; color: var(--text); line-height: 1.4; margin-bottom: 6px; min-height: 28px; display: flex; align-items: center; justify-content: center; word-break: break-word; }
 .result-highlight { display: inline-block; font-size: 9px; font-weight: 800; color: #00B85C; background: rgba(0,184,92,0.1); border: 1px solid rgba(0,184,92,0.2); padding: 3px 8px; border-radius: 100px; letter-spacing: 0.02em; }
 
 /* ===================== WORD REVEAL ANIMATION ===================== */
@@ -1212,11 +1212,11 @@ html, body {
   <div class="step active" id="step0">
     <div class="exclusive-badge">Exclusivo para empresários que faturam +20 mil/mês</div>
     <h1 class="step-title word-reveal" id="introTitle" style="font-size:22px;color:#FF0A0A">ATÉ QUANDO VOCÊ VAI TOLERAR UM COMERCIAL QUE NÃO ENTREGA?</h1>
-    <p class="step-subtitle" style="color:#F4F4F5;font-weight:700">Um comercial fraco, custa caro demais. Tome a decisão de mudar seus resultados. Aumente de 20% a 50% do seu faturamento em poucas semanas.</p>
+    <p class="step-subtitle" style="color:#F4F4F5;font-weight:700;font-size:13px">Um comercial fraco, custa caro demais. Tome a decisão de mudar seus resultados. Aumente de 20% a 50% do seu faturamento em poucas semanas.</p>
     <div class="btn-row">
       <button class="btn-primary" onclick="goTo(1)">CONTINUAR</button>
     </div>
-    <p class="cta-explainer">Clique e preencha o formulário. Em apenas 1 minuto, você terá clareza de como romper os limites do seu comercial.</p>
+    <p class="cta-explainer">Clique e preencha o formulário.<br>Em apenas 1 minuto, você terá clareza de como romper os limites do seu comercial.</p>
 
     <!-- RESULTADOS COMUNS -->
     <div class="results-section">
@@ -1297,7 +1297,7 @@ html, body {
     <div class="btn-row" style="margin-top:24px">
       <button class="btn-primary" onclick="goTo(1)">CONTINUAR</button>
     </div>
-    <p class="cta-explainer">Clique e preencha o formulário. Em apenas 1 minuto, você terá clareza de como romper os limites do seu comercial.</p>
+    <p class="cta-explainer">Clique e preencha o formulário.<br>Em apenas 1 minuto, você terá clareza de como romper os limites do seu comercial.</p>
 
     <div class="about-divider"></div>
 
@@ -1337,7 +1337,7 @@ html, body {
     <div class="btn-row" style="margin-top:24px">
       <button class="btn-primary" onclick="goTo(1)">CONTINUAR</button>
     </div>
-    <p class="cta-explainer">Clique e preencha o formulário. Em apenas 1 minuto, você terá clareza de como romper os limites do seu comercial.</p>
+    <p class="cta-explainer">Clique e preencha o formulário.<br>Em apenas 1 minuto, você terá clareza de como romper os limites do seu comercial.</p>
   </div>
 
   <!-- STEP 1: NOME -->
