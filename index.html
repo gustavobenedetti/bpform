@@ -63,7 +63,6 @@ html, body {
   border-radius: 50%;
   filter: blur(80px);
   opacity: 0.4;
-  animation: orb-float 12s ease-in-out infinite;
 }
 
 .bg-orb-1 {
@@ -887,25 +886,7 @@ html, body {
   margin-bottom: 28px;
 }
 
-/* ===================== PARTICLES ===================== */
-.particle {
-  position: fixed;
-  width: 2px;
-  height: 2px;
-  background: var(--accent);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0;
-  animation: particle-drift 8s ease-in-out infinite;
-}
-
-@keyframes particle-drift {
-  0% { opacity: 0; transform: translateY(0) scale(1); }
-  20% { opacity: 0.4; }
-  80% { opacity: 0.2; }
-  100% { opacity: 0; transform: translateY(-200px) scale(0.5); }
-}
+/* ===================== PARTICLES (removed - static bg) ===================== */
 
 /* ===================== RIPPLE EFFECT ===================== */
 .ripple {
@@ -1186,10 +1167,7 @@ html, body {
 <div class="bg-horizon"></div>
 
 <!-- Particles -->
-<div class="particle" style="left:10%;top:80%;animation-delay:0s"></div>
-<div class="particle" style="left:50%;top:90%;animation-delay:4s"></div>
-<div class="particle" style="left:75%;top:75%;animation-delay:1s"></div>
-<div class="particle" style="left:90%;top:85%;animation-delay:3s"></div>
+
 
 <!-- Progress -->
 <div class="progress-wrapper">
