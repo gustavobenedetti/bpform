@@ -11,8 +11,24 @@
 <link rel="preconnect" href="https://cal.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <!-- Meta Pixel -->
-<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','2305140706978369');fbq('track','PageView');</script>
-<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2305140706978369&ev=PageView&noscript=1"/></noscript>
+<script>
+// ID próprio do PageView (separado do ID usado pelo evento Lead), gerado antes do
+// pixel disparar, para permitir deduplicação com o reforço via servidor (CAPI).
+(function(){
+  try {
+    var id = sessionStorage.getItem('bp_pv_event_id');
+    if (!id) {
+      id = 'bp_pv_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+      sessionStorage.setItem('bp_pv_event_id', id);
+    }
+    window.BP_PAGE_VIEW_EVENT_ID = id;
+  } catch (e) {
+    window.BP_PAGE_VIEW_EVENT_ID = 'bp_pv_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+  }
+})();
+</script>
+<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','2850276152017506');fbq('track','PageView',{},{eventID:window.BP_PAGE_VIEW_EVENT_ID});</script>
+<noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2850276152017506&ev=PageView&noscript=1"/></noscript>
 <style>
 *, *::before, *::after {
   margin: 0;
@@ -1533,7 +1549,7 @@ async function sendPayload(payload) {
 }
 
 function sendToSheet(etapa) {
-  const payload = { ...formData, etapa, event_id: SESSION_EVENT_ID, ts: Date.now() };
+  const payload = { ...formData, etapa, event_id: SESSION_EVENT_ID, page_view_event_id: window.BP_PAGE_VIEW_EVENT_ID || '', ts: Date.now() };
   sendPayload(payload).catch(() => {
     // Antes de assumir falha, tenta mais uma vez após um pequeno intervalo — instabilidades
     // momentâneas de rede (comuns em 4G/5G) não devem gerar um alerta desnecessário.
@@ -1624,7 +1640,7 @@ function validateAndGo(from, to) {
     const val = document.getElementById('fieldWhatsapp').value.trim();
     const digits = val.replace(/\D/g, '');
     if (digits.length < 10 || digits.length > 11) { showError('fieldWhatsapp', 'hintWhatsapp', 'Informe um número válido'); valid = false; }
-    else { clearError('fieldWhatsapp', 'hintWhatsapp'); formData.whatsapp = val; if(typeof fbq!=='undefined') fbq('track','Lead', {}, { eventID: SESSION_EVENT_ID }); }
+    else { clearError('fieldWhatsapp', 'hintWhatsapp'); formData.whatsapp = val; }
   }
   if (from === 3) {
     const val = document.getElementById('fieldInstagram').value.trim();
@@ -1657,6 +1673,7 @@ function selectAndSubmit(el) {
   el.classList.add('selected');
   el.classList.add('pulse');
   formData.desafio = el.dataset.value;
+  if (typeof fbq !== 'undefined') fbq('track', 'Lead', {}, { eventID: SESSION_EVENT_ID });
   sendToSheet('desafio');
   setTimeout(() => goTo(6), 350);
 }
