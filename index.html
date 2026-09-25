@@ -1313,7 +1313,7 @@ html, body {
   <!-- STEP 0: INTRO -->
   <div class="step active" id="step0">
     <div class="exclusive-badge">Exclusivo para empresários que faturam +20 mil/mês</div>
-    <h1 class="step-title word-reveal" id="introTitle" style="font-size:22px;color:#F4F4F5"><span class="highlight">O MÉTODO ENGENHARIA COMERCIAL</span> É O PRÓXIMO PASSO PARA ROMPER SUA TAMPA DE FATURAMENTO.</h1>
+    <h1 class="step-title word-reveal" id="introTitle" style="font-size:19px;color:#F4F4F5"><span class="highlight">O MÉTODO ENGENHARIA COMERCIAL</span> É O PRÓXIMO PASSO PARA ROMPER SUA TAMPA DE FATURAMENTO.</h1>
 
     <div style="width:100%;max-width:340px;margin:20px 0 0;text-align:left">
       <p style="font-size:14px;color:#F4F4F5;font-weight:600;margin:18px 0;line-height:1.45">→&nbsp; Canais de aquisição que captam clientes todos os dias.</p>
@@ -1807,7 +1807,7 @@ function initWordReveal() {
         else if (w) parts.push({ type: 'space', content: w });
       });
     } else if (node.nodeType === 1) {
-      parts.push({ type: 'element', el: node });
+      parts.push({ type: node.tagName === 'BR' ? 'break' : 'element', el: node });
     }
   });
   let delay = 0;
@@ -1815,6 +1815,8 @@ function initWordReveal() {
   parts.forEach(p => {
     if (p.type === 'space') {
       title.appendChild(document.createTextNode(p.content));
+    } else if (p.type === 'break') {
+      title.appendChild(p.el);
     } else if (p.type === 'element') {
       p.el.style.cssText += `display:inline-block;opacity:0;filter:blur(4px);animation:word-in 0.5s ease ${delay}s forwards`;
       title.appendChild(p.el);
