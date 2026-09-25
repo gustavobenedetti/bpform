@@ -7,6 +7,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://connect.facebook.net">
+<link rel="preconnect" href="https://app.cal.com">
+<link rel="preconnect" href="https://cal.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <!-- Meta Pixel -->
 <script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','2305140706978369');fbq('track','PageView');</script>
@@ -925,7 +927,7 @@ html, body {
 .client-card { flex-shrink: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0 18px; height: 48px; display: flex; align-items: center; justify-content: center; min-width: 100px; transition: border-color .25s; }
 .client-card:hover { border-color: rgba(59,130,246,0.4); }
 .client-logo { height: 22px; width: auto; filter: brightness(0) invert(1) opacity(0.75); }
-.exclusive-badge { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.01em; color: #FF0A0A; background: rgba(255,10,10,0.08); border: 1px solid rgba(255,10,10,0.2); padding: 7px 14px; border-radius: 100px; margin-bottom: 16px; text-align: center; white-space: nowrap; }
+.exclusive-badge { display: inline-block; font-size: 9px; font-weight: 800; letter-spacing: 0.01em; color: #FBBF24; background: rgba(251,191,36,0.08); border: 1px solid rgba(251,191,36,0.25); padding: 7px 14px; border-radius: 100px; margin-bottom: 16px; text-align: center; white-space: nowrap; }
 .results-section { width: 100%; max-width: 480px; margin: 48px auto 0; overflow: hidden; padding-top: 28px; border-top: 1px solid var(--border); }
 .results-label { font-size: 17px; font-weight: 800; letter-spacing: -0.01em; text-transform: none; color: #F4F4F5; margin-bottom: 14px; text-align: center; }
 .results-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: stretch; }
@@ -1083,12 +1085,45 @@ html, body {
 .cal-embed-wrap {
   width: 100%;
   max-width: 480px;
-  height: 600px;
+  min-height: 220px;
   margin: 0 auto;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  overflow: hidden;
+  overflow: visible;
+  position: relative;
+}
+
+.cal-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 60px 20px;
+  transition: opacity 0.3s ease;
+}
+
+.cal-loading.hidden {
+  display: none;
+}
+
+.cal-spinner {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2.5px solid var(--border);
+  border-top-color: var(--accent);
+  animation: cal-spin 0.8s linear infinite;
+}
+
+@keyframes cal-spin {
+  to { transform: rotate(360deg); }
+}
+
+.cal-loading-text {
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .skip-scheduling {
@@ -1106,7 +1141,7 @@ html, body {
 }
 
 @media (max-width: 480px) {
-  .cal-embed-wrap { height: 520px; }
+  .cal-embed-wrap { min-height: 180px; }
 }
 
 /* ===================== TRANSIÇÃO DE REDIRECIONAMENTO (WHATSAPP) ===================== */
@@ -1241,7 +1276,7 @@ html, body {
 #step0 { text-align: left; }
 #step0 .exclusive-badge { text-align: left; margin-left: 0; margin-right: auto; }
 #step0 .btn-row { justify-content: flex-start; }
-#step0 .btn-primary { max-width: 100%; border-radius: 6px; }
+#step0 .btn-primary { flex: 0 0 auto; max-width: fit-content; padding: 12px 22px; font-size: 13px; border-radius: 6px; }
 #step0 .cta-explainer { text-align: left; margin-left: 0; margin-right: auto; }
 </style>
 </head>
@@ -1278,16 +1313,16 @@ html, body {
   <!-- STEP 0: INTRO -->
   <div class="step active" id="step0">
     <div class="exclusive-badge">Exclusivo para empresários que faturam +20 mil/mês</div>
-    <h1 class="step-title word-reveal" id="introTitle" style="font-size:22px;color:#FF0A0A">UM COMERCIAL ESTRUTURADO É O PRÓXIMO PASSO PARA ROMPER SUA TAMPA DE FATURAMENTO.</h1>
+    <h1 class="step-title word-reveal" id="introTitle" style="font-size:22px;color:#F4F4F5"><span class="highlight">O MÉTODO ENGENHARIA COMERCIAL</span> É O PRÓXIMO PASSO PARA ROMPER SUA TAMPA DE FATURAMENTO.</h1>
 
     <div style="width:100%;max-width:340px;margin:20px 0 0;text-align:left">
-      <p style="font-size:14px;color:#F4F4F5;font-weight:600;margin:10px 0;line-height:1.45">🎯&nbsp; Canais de aquisição que captam clientes todos os dias</p>
-      <p style="font-size:14px;color:#F4F4F5;font-weight:600;margin:10px 0;line-height:1.45">🧩&nbsp; Processo comercial que converte oportunidades em vendas</p>
-      <p style="font-size:14px;color:#F4F4F5;font-weight:600;margin:10px 0;line-height:1.45">💰&nbsp; Oferta que faz você parar de dar desconto</p>
+      <p style="font-size:14px;color:#F4F4F5;font-weight:600;margin:18px 0;line-height:1.45">→&nbsp; Canais de aquisição que captam clientes todos os dias.</p>
+      <p style="font-size:14px;color:#F4F4F5;font-weight:600;margin:18px 0;line-height:1.45">→&nbsp; Processo comercial que converte oportunidades em vendas.</p>
+      <p style="font-size:14px;color:#F4F4F5;font-weight:600;margin:18px 0;line-height:1.45">→&nbsp; Oferta que faz você parar de dar desconto.</p>
     </div>
 
     <div class="btn-row" style="margin-top:24px">
-      <button class="btn-primary" onclick="goTo(1)">QUERO AUMENTAR MINHAS VENDAS!</button>
+      <button class="btn-primary" onclick="goTo(1)">QUERO AUMENTAR MINHAS VENDAS</button>
     </div>
     <p class="cta-explainer">Clique e responda algumas perguntas rápidas sobre o seu comercial.</p>
   </div>
@@ -1392,7 +1427,11 @@ html, body {
     <p class="step-subtitle">Escolha o melhor dia e horário para conversar com o nosso time:</p>
 
     <div class="cal-embed-wrap">
-      <div style="width:100%;height:100%;overflow:scroll" id="my-cal-inline-agendamento"></div>
+      <div class="cal-loading" id="calLoading">
+        <div class="cal-spinner"></div>
+        <span class="cal-loading-text">Carregando calendário…</span>
+      </div>
+      <div style="width:100%" id="my-cal-inline-agendamento"></div>
     </div>
 
     <div class="btn-row" style="margin-top:20px">
@@ -1505,10 +1544,16 @@ async function sendPayload(payload) {
 function sendToSheet(etapa) {
   const payload = { ...formData, etapa, event_id: SESSION_EVENT_ID, ts: Date.now() };
   sendPayload(payload).catch(() => {
-    const queue = readQueue();
-    queue.push(payload);
-    writeQueue(queue);
-    showSubmitWarning();
+    // Antes de assumir falha, tenta mais uma vez após um pequeno intervalo — instabilidades
+    // momentâneas de rede (comuns em 4G/5G) não devem gerar um alerta desnecessário.
+    setTimeout(() => {
+      sendPayload(payload).catch(() => {
+        const queue = readQueue();
+        queue.push(payload);
+        writeQueue(queue);
+        showSubmitWarning();
+      });
+    }, 1200);
   });
 }
 
@@ -1699,6 +1744,14 @@ function initScheduling() {
   });
 
   Cal.ns.agendamento("ui", { "hideEventTypeDetails": false, "layout": "month_view" });
+
+  // Esconde o "Carregando calendário..." assim que o widget sinalizar que está pronto.
+  // Como esse evento depende do script do Cal.com carregar e disparar a tempo, mantemos
+  // um fallback por tempo — se não disparar em alguns segundos, escondemos mesmo assim,
+  // para nunca deixar o spinner girando pra sempre.
+  const hideLoading = () => document.getElementById('calLoading')?.classList.add('hidden');
+  Cal.ns.agendamento("on", { action: "linkReady", callback: hideLoading });
+  setTimeout(hideLoading, 5000);
 
   // Quando a reunião é confirmada dentro do widget, avança automaticamente para o
   // agradecimento — sem exigir nenhuma ação extra da pessoa.
